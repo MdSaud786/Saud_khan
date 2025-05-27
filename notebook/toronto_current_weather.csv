@@ -1,0 +1,3 @@
+city,country,description,feels_like,humidity,icon,pressure,temperature,wind_speed,collection_timestamp
+Toronto,CA,clear sky,9.61,79,01d,1025,10.45,4.92,2025-05-26 18:00:16
+Toronto,CA,clear sky,13.49,71,01d,1025,14.16,4.92,2025-05-26 19:10:19

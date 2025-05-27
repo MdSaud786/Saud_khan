@@ -1,0 +1,3 @@
+city,country,description,feels_like,humidity,icon,pressure,temperature,wind_speed,collection_timestamp
+Paris,FR,broken clouds,17.34,51,04d,1021,18.14,5.14,2025-05-26 17:11:53
+Paris,FR,overcast clouds,18.24,50,04d,1021,18.98,5.66,2025-05-26 18:49:21

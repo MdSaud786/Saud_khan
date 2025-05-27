@@ -1,0 +1,3 @@
+city,country,description,feels_like,humidity,icon,pressure,temperature,wind_speed,collection_timestamp
+Tokyo,JP,light rain,17.9,55,10n,1021,18.55,5.14,2025-05-26 17:22:14
+Tokyo,JP,light rain,17.48,66,10n,1022,17.91,4.63,2025-05-26 19:03:19

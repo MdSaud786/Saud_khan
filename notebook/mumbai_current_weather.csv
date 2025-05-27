@@ -1,0 +1,5 @@
+city,country,description,feels_like,humidity,icon,pressure,temperature,wind_speed,collection_timestamp
+Mumbai,IN,overcast clouds,31.13,94,04d,1000,26.99,4.12,2025-05-26 17:16:35
+Mumbai,IN,overcast clouds,25.99,94,04d,1001,25.99,3.6,2025-05-26 18:27:35
+Mumbai,IN,mist,25.99,94,50n,1001,25.99,3.09,2025-05-26 19:22:26
+Mumbai,IN,mist,25.99,94,50n,1001,25.99,3.09,2025-05-26 19:23:21
