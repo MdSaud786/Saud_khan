@@ -6,5 +6,5 @@ joblib==1.5.1
 numpy==1.26.4
 pandas==2.2.3
 requests==2.32.3
-scikit-learn==1.4.2
+scikit-learn==1.6.1  # Replace 1.6.1 with your actual version if different
 python-dotenv # <--- Ye line add karein
