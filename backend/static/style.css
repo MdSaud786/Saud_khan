@@ -1,29 +1,44 @@
 /* General Styling */
 body {
-    font-family: 'Poppins', sans-serif; /* New font */
-    background: linear-gradient(135deg, #72EDF2 10%, #5150D8 100%); /* Gradient background */
-    color: #fff; /* White text for better contrast */
+    font-family: 'Poppins', sans-serif;
+    /* Lighter blue and white gradient as per screenshot */
+    background: linear-gradient(135deg, #e0f2f7 0%, #b3e5fc 100%); /* Light blue tones */
+    color: #333; /* Darker text for better readability on light background */
     margin: 0;
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: center; /* Center vertically */
+    align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease; /* For dark mode transition */
+}
+
+/* Dark Mode styles */
+body.dark-mode {
+    background: linear-gradient(135deg, #2b2b2b 0%, #000000 100%); /* Darker gradient */
+    color: #f0f0f0; /* Lighter text for dark mode */
 }
 
 .container {
-    background-color: rgba(255, 255, 255, 0.15); /* Semi-transparent white background */
-    backdrop-filter: blur(10px); /* Glassmorphism effect */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
+    background-color: rgba(255, 255, 255, 0.85); /* Slightly less transparent white */
+    backdrop-filter: blur(10px);
+    border-radius: 15px; /* More rounded container as per screenshot */
     padding: 40px;
-    border-radius: 20px; /* More rounded corners */
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Stronger shadow */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); /* Softer shadow */
     width: 100%;
-    max-width: 900px; /* Slightly wider */
+    max-width: 900px;
     text-align: center;
-    animation: fadeIn 1s ease-out; /* Fade-in animation */
+    animation: fadeIn 1s ease-out;
+    transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; /* For dark mode transition */
+}
+
+/* Dark Mode Container */
+body.dark-mode .container {
+    background-color: rgba(0, 0, 0, 0.7); /* Darker semi-transparent background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
 }
 
 /* Keyframe for fade-in animation */
@@ -33,82 +48,132 @@ body {
 }
 
 h1, h2 {
-    color: #fff; /* White headings */
+    color: #333; /* Dark headings for light mode */
     margin-bottom: 25px;
-    font-weight: 600; /* Bolder headings */
+    font-weight: 600;
+}
+
+/* Dark Mode Headings */
+body.dark-mode h1, body.dark-mode h2 {
+    color: #f0f0f0; /* Lighter headings for dark mode */
 }
 
 /* Input and Button Styling */
 .search-section, .prediction-form {
     display: flex;
     justify-content: center;
-    gap: 15px; /* Increased gap */
+    gap: 15px;
     margin-bottom: 30px;
     flex-wrap: wrap;
 }
 
 input[type="text"], input[type="number"] {
-    padding: 12px 15px;
-    border: 1px solid rgba(255, 255, 255, 0.5); /* Lighter border */
-    border-radius: 8px; /* More rounded */
-    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent input background */
-    color: #fff; /* White text in input */
+    padding: 12px 20px; /* Adjusted padding */
+    border: none; /* Remove border */
+    border-radius: 25px; /* More rounded input as per screenshot */
+    background-color: rgba(255, 255, 255, 0.7); /* Lighter background for light mode */
+    color: #333; /* Darker text */
     flex: 1;
     min-width: 180px;
     font-size: 1em;
-    outline: none; /* Remove outline on focus */
+    outline: none;
     transition: all 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle inner shadow */
 }
 
 input[type="text"]::placeholder, input[type="number"]::placeholder {
-    color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
+    color: #999;
 }
 
 input[type="text"]:focus, input[type="number"]:focus {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(0, 123, 255, 0.2); /* Blue glow on focus */
 }
 
+/* Dark Mode Inputs */
+body.dark-mode input[type="text"], body.dark-mode input[type="number"] {
+    background-color: rgba(255, 255, 255, 0.1); /* Darker input background */
+    color: #f0f0f0;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode input[type="text"]::placeholder, body.dark-mode input[type="number"]::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+body.dark-mode input[type="text"]:focus, body.dark-mode input[type="number"]:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(0, 123, 255, 0.4);
+}
+
+
 button {
-    background-color: #00bcd4; /* Brighter blue */
+    background-color: #007bff; /* Primary blue as per screenshot */
     color: white;
     padding: 12px 25px;
     border: none;
-    border-radius: 8px;
+    border-radius: 25px; /* More rounded button as per screenshot */
     cursor: pointer;
     font-size: 1.1em;
     font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Add transform for subtle animation */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 button:hover {
-    background-color: #0097a7; /* Darker blue on hover */
-    transform: translateY(-2px); /* Lift effect */
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
+
+/* Dark Mode Button */
+body.dark-mode button {
+    background-color: #4CAF50; /* Example: Green for dark mode button */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode button:hover {
+    background-color: #388E3C; /* Darker green on hover */
+}
+
 
 /* Display Sections */
 .weather-display, .prediction-result {
     margin-top: 25px;
     padding: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* border: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border for light mode */
     border-radius: 15px; /* Rounded corners */
-    background-color: rgba(255, 255, 255, 0.1); /* Lighter semi-transparent */
+    background-color: rgba(255, 255, 255, 0.8); /* Lighter background for light mode */
     text-align: left;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
 }
+
+/* Dark Mode Display Sections */
+body.dark-mode .weather-display, body.dark-mode .prediction-result {
+    background-color: rgba(0, 0, 0, 0.5); /* Darker background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
 
 .weather-display p, .prediction-result p {
     font-size: 1.1em;
     line-height: 1.6;
-    color: #eee;
+    color: #333; /* Darker text for light mode */
 }
+
+/* Dark Mode Paragraphs */
+body.dark-mode .weather-display p, body.dark-mode .prediction-result p {
+    color: #f0f0f0; /* Lighter text for dark mode */
+}
+
 
 .weather-display img, .forecast-card img {
     vertical-align: middle;
     margin-left: 8px;
-    width: 40px; /* Larger icons */
-    height: 40px;
+    width: 50px; /* Larger icons for current weather */
+    height: 50px;
 }
 
 /* Forecast Section */
@@ -119,51 +184,145 @@ button:hover {
 .forecast-display {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px; /* Increased gap */
+    gap: 20px;
     justify-content: center;
     margin-top: 25px;
 }
 
 .forecast-card {
-    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent */
+    background-color: rgba(255, 255, 255, 0.7); /* Lighter background for light mode */
     padding: 20px;
     border-radius: 15px; /* Rounded corners */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    flex: 1 1 calc(33% - 40px); /* 3 columns with gap */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    flex: 1 1 calc(33% - 40px);
     min-width: 250px;
     box-sizing: border-box;
     text-align: left;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .forecast-card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow on hover */
+}
+
+/* Dark Mode Forecast Card */
+body.dark-mode .forecast-card {
+    background-color: rgba(0, 0, 0, 0.3); /* Darker background */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .forecast-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
 }
 
 .forecast-card h3 {
-    color: #fff;
+    color: #333; /* Dark headings for light mode */
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.2em;
     font-weight: 600;
 }
 
+/* Dark Mode Forecast Card Headings */
+body.dark-mode .forecast-card h3 {
+    color: #f0f0f0; /* Lighter headings for dark mode */
+}
+
 .forecast-card p {
     font-size: 0.95em;
-    color: #eee;
+    color: #555; /* Slightly darker text for light mode */
+}
+
+/* Dark Mode Forecast Card Paragraphs */
+body.dark-mode .forecast-card p {
+    color: #ccc; /* Lighter text for dark mode */
 }
 
 .prediction-section {
     margin-top: 40px;
     padding-top: 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
+    border-top: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border */
+}
+
+/* Dark Mode Prediction Section Border */
+body.dark-mode .prediction-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .prediction-result {
     text-align: center;
     font-weight: 600;
     font-size: 1.2em;
-    color: #fff;
+    color: #333; /* Darker text for light mode */
+}
+
+/* Dark Mode Prediction Result */
+body.dark-mode .prediction-result {
+    color: #f0f0f0; /* Lighter text for dark mode */
+}
+
+
+/* NEW: Dark Mode Toggle Switch */
+.theme-switch-wrapper {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 26px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 26px;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3; /* Blue for ON state */
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Round slider */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
 }
 
 /* Responsive Adjustments */
@@ -178,15 +337,19 @@ button:hover {
     }
     input[type="text"], input[type="number"], button {
         width: 100%;
-        min-width: unset; /* Remove min-width on small screens */
+        min-width: unset;
     }
     .forecast-card {
-        flex: 1 1 calc(50% - 20px); /* 2 columns on medium screens */
+        flex: 1 1 calc(50% - 20px);
+    }
+    .theme-switch-wrapper {
+        top: 10px;
+        right: 10px;
     }
 }
 
 @media (max-width: 550px) {
     .forecast-card {
-        flex: 1 1 100%; /* Single column on small screens */
+        flex: 1 1 100%;
     }
 }
