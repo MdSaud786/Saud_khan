@@ -1,6 +1,20 @@
-/* --- Global Variables and Base Styles --- */
+/* Global Variables and Base Styles (Dark Mode by Default) */
 :root {
-    /* Colors for Light Mode */
+    --bg-color: #2c2c2c; /* Dark gray background */
+    --card-bg: #3A3A3A; /* Darker gray card background */
+    --text-color-primary: #e0e0e0; /* Light gray for main text */
+    --text-color-secondary: #b0b0b0; /* Lighter gray for secondary text */
+    --accent-color: #6A8DFF; /* Lighter blue for accents */
+    --accent-dark: #4D6EDF; /* Darker blue for hover */
+    --border-color: #4A4A4A; /* Darker border */
+    --shadow-light: rgba(0, 0, 0, 0.3); /* Subtle shadow for dark mode */
+    --shadow-medium: rgba(0, 0, 0, 0.5); /* Slightly darker shadow for dark mode */
+    --input-bg: #4A4A4A; /* Dark gray for input backgrounds */
+    --error-color: #ff6b6b; /* Red for errors */
+}
+
+/* Light Mode Variables (if toggle exists, although the user preferred dark) */
+[data-theme="light"] {
     --bg-color: #F8F9FA; /* Very light gray background */
     --card-bg: #FFFFFF; /* White card background */
     --text-color-primary: #333333; /* Dark gray for main text */
@@ -11,27 +25,9 @@
     --shadow-light: rgba(0, 0, 0, 0.08); /* Subtle shadow */
     --shadow-medium: rgba(0, 0, 0, 0.15); /* Slightly darker shadow */
     --input-bg: #F0F2F5; /* Light gray for input backgrounds */
-    --icon-color: #6c757d; /* Default icon color */
     --error-color: #dc3545; /* Red for errors */
-    --success-color: #28a745; /* Green for success */
 }
 
-/* Colors for Dark Mode */
-[data-theme="dark"] {
-    --bg-color: #2C2C2C; /* Dark gray background */
-    --card-bg: #3A3A3A; /* Darker gray card background */
-    --text-color-primary: #E0E0E0; /* Light gray for main text */
-    --text-color-secondary: #B0B0B0; /* Lighter gray for secondary text */
-    --accent-color: #6A8DFF; /* Lighter blue for dark mode accents */
-    --accent-dark: #4D6EDF; /* Darker blue for hover */
-    --border-color: #4A4A4A; /* Darker border */
-    --shadow-light: rgba(0, 0, 0, 0.3);
-    --shadow-medium: rgba(0, 0, 0, 0.5);
-    --input-bg: #4A4A4A;
-    --icon-color: #E0E0E0;
-    --error-color: #ff6b6b;
-    --success-color: #4CAF50;
-}
 
 body {
     font-family: 'Roboto', sans-serif;
@@ -47,14 +43,14 @@ body {
     box-sizing: border-box;
 }
 
-/* --- Container and Header --- */
+/* Container and Header */
 .container {
     background-color: var(--card-bg);
-    border-radius: 20px; /* More rounded corners */
-    box-shadow: 0 10px 30px var(--shadow-medium);
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 8px 25px var(--shadow-medium);
     padding: 30px;
     width: 100%;
-    max-width: 850px; /* Wider container for more content */
+    max-width: 600px; /* Adjusted width to match screenshot */
     text-align: center;
     transition: background-color 0.4s ease, box-shadow 0.4s ease;
     display: flex;
@@ -67,29 +63,26 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
-    position: relative; /* For absolute positioning of settings/dark mode toggle */
 }
 
 .header h1 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.8em; /* Slightly smaller for balance */
+    font-size: 1.8em;
     color: var(--accent-color);
     margin: 0;
-    flex-grow: 1; /* Allows it to take space */
-    text-align: left; /* Align to left as per screenshot */
+    flex-grow: 1;
+    text-align: left;
     transition: color 0.4s ease;
 }
 
-/* Dark Mode Toggle / Settings Icon */
 .dark-mode-toggle {
-    background: none; /* No background */
+    background: none;
     border: none;
-    font-size: 1.6em; /* Larger icon */
+    font-size: 1.6em;
     cursor: pointer;
-    color: var(--text-color-secondary); /* Icon color */
+    color: var(--text-color-secondary);
     transition: color 0.3s ease, transform 0.2s ease;
     padding: 0;
-    margin-left: 15px; /* Space from title */
 }
 
 .dark-mode-toggle:hover {
@@ -97,28 +90,23 @@ body {
     transform: rotate(20deg);
 }
 
-/* --- Search Box --- */
+/* Search Box */
 .search-box {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 30px;
-    background-color: var(--input-bg);
-    border-radius: 15px;
-    padding: 8px;
-    box-shadow: inset 0 1px 3px var(--shadow-light);
-    transition: background-color 0.4s ease;
 }
 
 .search-box input[type="text"] {
     flex-grow: 1;
     padding: 12px 15px;
-    border: none; /* No border for input */
-    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     font-size: 1.05em;
     outline: none;
-    background-color: transparent; /* Transparent background to show parent's input-bg */
+    background-color: var(--input-bg);
     color: var(--text-color-primary);
-    transition: color 0.4s ease;
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
 .search-box input[type="text"]::placeholder {
@@ -130,7 +118,7 @@ body {
     background-color: var(--accent-color);
     color: white;
     border: none;
-    border-radius: 12px; /* Rounded button */
+    border-radius: 8px;
     padding: 12px 20px;
     font-size: 1em;
     cursor: pointer;
@@ -150,10 +138,10 @@ body {
     cursor: not-allowed;
 }
 
-/* --- Loading and Error --- */
+/* Loading and Error */
 .loading, .error-display {
     padding: 20px;
-    border-radius: 15px;
+    border-radius: 10px;
     margin-bottom: 20px;
     font-size: 1.1em;
     display: flex;
@@ -162,6 +150,7 @@ body {
     justify-content: center;
     gap: 10px;
     box-shadow: 0 4px 15px var(--shadow-light);
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .loading {
@@ -188,85 +177,72 @@ body {
     color: white;
 }
 
-/* --- Main Weather Display Sections --- */
-.weather-sections-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Spacing between main sections */
-}
-
-/* Current Weather Card */
-.current-weather-card {
+/* --- Weather Display Card --- */
+.weather-card, .prediction-card, .forecast-section {
     background-color: var(--card-bg);
-    border-radius: 20px;
-    padding: 25px;
+    border-radius: 15px;
     box-shadow: 0 4px 15px var(--shadow-light);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
+    padding: 25px;
+    margin-bottom: 20px; /* Spacing between sections */
     transition: background-color 0.4s ease;
 }
 
-.location-info {
+.weather-card h2, .prediction-card h2, .forecast-section h2 {
     font-size: 1.8em;
+    color: var(--accent-color);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.weather-card .location {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--text-color-primary);
+    margin-bottom: 10px;
+}
+
+.weather-card .temperature {
+    font-size: 3.5em; /* Large temperature */
     font-weight: 700;
     color: var(--accent-color);
     margin-bottom: 10px;
 }
 
-.main-temp-icon {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+.weather-card .description {
+    font-size: 1.3em;
+    color: var(--text-color-secondary);
+    text-transform: capitalize;
     margin-bottom: 15px;
 }
 
-.main-temp {
-    font-size: 5em; /* Large temperature */
-    font-weight: 700;
-    color: var(--text-color-primary);
-    line-height: 1; /* Remove extra line height */
+.weather-card .icon-wrapper {
+    margin-bottom: 15px;
 }
 
-.weather-icon-large {
-    width: 100px;
-    height: 100px;
+.weather-card .icon-wrapper img {
+    width: 80px;
+    height: 80px;
 }
 
-.weather-description {
-    font-size: 1.4em;
-    font-weight: 500;
-    color: var(--text-color-secondary);
-    text-transform: capitalize;
-}
-
-/* Details Grid */
 .weather-details-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* 3 columns on larger screens */
+    grid-template-columns: repeat(2, 1fr); /* Two columns for details */
     gap: 15px;
-    width: 100%;
     margin-top: 20px;
 }
 
 .detail-item {
     background-color: var(--input-bg); /* Use input background for detail cards */
     padding: 15px;
-    border-radius: 15px;
+    border-radius: 10px;
     box-shadow: 0 2px 8px var(--shadow-light);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    font-size: 0.95em;
+    gap: 5px;
+    font-size: 0.9em;
     color: var(--text-color-primary);
     transition: background-color 0.4s ease;
-}
-
-.detail-item .icon {
-    font-size: 1.5em;
-    color: var(--accent-color);
 }
 
 .detail-item .label {
@@ -279,159 +255,63 @@ body {
     font-size: 1.1em;
 }
 
-/* --- Hourly Forecast Section --- */
-.hourly-forecast-section {
-    background-color: var(--card-bg);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 15px var(--shadow-light);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    transition: background-color 0.4s ease;
-}
-
-.hourly-forecast-section h3 {
-    text-align: left; /* Align to left */
-    margin: 0;
-    font-size: 1.4em;
-    color: var(--accent-color);
-}
-
-.hourly-cards-container {
-    display: flex;
-    overflow-x: auto; /* Horizontal scrolling */
-    padding-bottom: 10px; /* Space for scrollbar */
-    gap: 15px;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scrollbar-width: thin; /* Firefox */
-    scrollbar-color: var(--accent-color) var(--input-bg); /* Firefox scrollbar color */
-}
-
-/* Custom scrollbar for Webkit (Chrome, Safari) */
-.hourly-cards-container::-webkit-scrollbar {
-    height: 8px;
-}
-
-.hourly-cards-container::-webkit-scrollbar-track {
-    background: var(--input-bg);
-    border-radius: 10px;
-}
-
-.hourly-cards-container::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 10px;
-}
-
-.hourly-card {
-    flex: 0 0 auto; /* Prevent cards from shrinking */
-    background-color: var(--input-bg);
-    padding: 15px 10px;
-    border-radius: 15px;
-    box-shadow: 0 2px 8px var(--shadow-light);
-    text-align: center;
-    width: 90px; /* Fixed width for hourly cards */
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+/* --- Prediction Display Card --- */
+.prediction-card p {
+    font-size: 3em; /* Large prediction text */
+    font-weight: 700;
     color: var(--text-color-primary);
-    transition: background-color 0.4s ease;
-}
-
-.hourly-card .time {
-    font-weight: 700;
-    font-size: 0.9em;
-    color: var(--text-color-secondary);
-}
-
-.hourly-card .temp {
-    font-weight: 700;
-    font-size: 1.2em;
-    color: var(--accent-color);
-}
-
-.hourly-card img {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto; /* Center image */
+    margin: 0;
 }
 
 /* --- Daily Forecast Section --- */
-.daily-forecast-section {
-    background-color: var(--card-bg);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 15px var(--shadow-light);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: background-color 0.4s ease;
+.forecast-section h2 {
+    text-align: center;
 }
 
-.daily-forecast-section h3 {
-    text-align: left; /* Align to left */
-    margin: 0;
-    font-size: 1.4em;
-    color: var(--accent-color);
+.daily-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for daily cards */
+    gap: 15px;
+    justify-content: center;
 }
 
 .daily-card {
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
     background-color: var(--input-bg);
-    border-radius: 15px;
-    box-shadow: 0 2px 5px var(--shadow-light);
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--shadow-light);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     transition: background-color 0.4s ease;
 }
 
-.daily-card .day {
-    flex: 1; /* Day name takes available space */
+.daily-card .date {
     font-weight: 700;
     color: var(--text-color-primary);
-    text-align: left;
+    font-size: 0.95em;
+}
+
+.daily-card .description-text {
+    font-size: 0.85em;
+    color: var(--text-color-secondary);
+    text-transform: capitalize;
 }
 
 .daily-card img {
-    width: 40px;
-    height: 40px;
-    margin: 0 10px;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
 }
 
 .daily-card .temp-range {
     font-weight: 700;
     color: var(--accent-color);
-    min-width: 100px; /* Fixed width for temp range */
-    text-align: right;
+    font-size: 1.1em;
 }
 
-/* --- Prediction Display --- */
-.prediction-display {
-    background-color: var(--card-bg);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 4px 15px var(--shadow-light);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: background-color 0.4s ease;
-}
-
-.prediction-display h2 {
-    font-size: 1.6em;
-    color: var(--accent-color);
-    margin: 0;
-}
-
-.prediction-display p {
-    font-size: 2.8em; /* Large prediction text */
-    font-weight: 700;
-    color: var(--text-color-primary);
-    margin: 0;
-}
-
-
-/* --- Responsive Adjustments --- */
+/* Responsive Adjustments */
 @media (max-width: 768px) {
     body {
         padding: 15px;
@@ -450,39 +330,17 @@ body {
         width: 100%;
         justify-content: center;
     }
-    .main-temp-icon {
-        flex-direction: column;
-        gap: 10px;
+    .weather-card .temperature {
+        font-size: 3em;
     }
-    .main-temp {
-        font-size: 4em;
+    .weather-card .description {
+        font-size: 1.1em;
     }
-    .weather-icon-large {
-        width: 80px;
-        height: 80px;
+    .prediction-card p {
+        font-size: 2.5em;
     }
-    .weather-description {
-        font-size: 1.2em;
-    }
-    .weather-details-grid {
+    .daily-cards-container {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    }
-    .detail-item {
-        padding: 12px;
-        font-size: 0.9em;
-    }
-    .hourly-cards-container {
-        padding-bottom: 8px;
-    }
-    .hourly-card {
-        width: 80px;
-        padding: 12px 8px;
-    }
-    .daily-card .temp-range {
-        min-width: 80px;
-    }
-    .prediction-display p {
-        font-size: 2.2em;
     }
 }
 
@@ -497,28 +355,13 @@ body {
         font-size: 0.9em;
         padding: 10px 15px;
     }
-    .main-temp {
-        font-size: 3.5em;
+    .weather-card .temperature {
+        font-size: 2.5em;
     }
-    .weather-icon-large {
-        width: 70px;
-        height: 70px;
+    .prediction-card p {
+        font-size: 2em;
     }
-    .weather-description {
-        font-size: 1em;
-    }
-    .detail-item {
-        font-size: 0.85em;
-    }
-    .hourly-card {
-        width: 70px;
-    }
-    .daily-card .temp-range {
-        min-width: 70px;
-        font-size: 0.9em;
-    }
-    .prediction-display p {
-        font-size: 1.8em;
+    .daily-cards-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on small screens */
     }
 }
-

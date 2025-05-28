@@ -1,62 +1,52 @@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Advanced Weather App</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>Weather & Temperature Prediction</h1>
-                <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
-                    <i class="fas fa-sun"></i> </button>
-            </div>
-
-            <div class="search-box">
-                <input type="text" id="cityInput" placeholder="Enter city name..." autocomplete="off">
-                <button id="searchBtn">
-                    <i class="fas fa-search"></i> Get Weather
-                </button>
-            </div>
-
-            <div id="loading" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Fetching weather data...</p>
-            </div>
-
-            <div id="errorDisplay" class="error-display" style="display: none;">
-                <p></p>
-            </div>
-
-            <div id="weatherSectionsWrapper" class="weather-sections-wrapper" style="display: none;">
-                <div id="currentWeatherCard" class="current-weather-card">
-                    </div>
-
-                <div id="hourlyForecastSection" class="hourly-forecast-section" style="display: none;">
-                    <h3>Hourly Forecast</h3>
-                    <div id="hourlyCardsContainer" class="hourly-cards-container">
-                        </div>
-                </div>
-
-                <div id="dailyForecastSection" class="daily-forecast-section" style="display: none;">
-                    <h3>5-Day Forecast</h3>
-                    <div id="dailyCardsContainer" class="daily-cards-container">
-                        </div>
-                </div>
-
-                <div id="predictionDisplay" class="prediction-display" style="display: none;">
-                    <h2>Predicted Temperature</h2>
-                    <p id="predictedTemp"></p>
-                </div>
-            </div>
-            
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather & Temperature Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Weather & Temperature Prediction</h1>
+            <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                <i class="fas fa-sun"></i> </button>
         </div>
 
-        <script src="{{ url_for('static', filename='script.js') }}"></script>
-    </body>
-    </html>
-    
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Enter city name..." autocomplete="off">
+            <button id="searchBtn">
+                <i class="fas fa-search"></i> Get Weather & Predict
+            </button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Fetching weather data...</p>
+        </div>
+
+        <div id="errorDisplay" class="error-display" style="display: none;">
+            <p></p>
+        </div>
+
+        <div id="weatherDisplay" class="weather-card" style="display: none;">
+            </div>
+
+        <div id="predictionDisplay" class="prediction-card" style="display: none;">
+            <h2>Predicted Temperature</h2>
+            <p id="predictedTemp"></p>
+        </div>
+
+        <div id="forecastDisplay" class="forecast-section" style="display: none;">
+            <h2>5-Day Forecast</h2>
+            <div id="dailyForecastContainer" class="daily-cards-container">
+                </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
