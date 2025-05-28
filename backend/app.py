@@ -1,237 +1,237 @@
-import os
-from flask import Flask, request, jsonify, render_template
-from flask_cors import CORS
-from dotenv import load_dotenv
-import requests
-import joblib
-import pandas as pd
-import sqlite3
-from datetime import datetime
+# import os
+# from flask import Flask, request, jsonify, render_template
+# from flask_cors import CORS
+# from dotenv import load_dotenv
+# import requests
+# import joblib
+# import pandas as pd
+# import sqlite3
+# from datetime import datetime
 
-# Flask app initialization
-# static_folder aur template_folder ko app.py ke directory ke relative set karein
-app = Flask(__name__,
-            template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
-            static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-CORS(app)
+# # Flask app initialization
+# # static_folder aur template_folder ko app.py ke directory ke relative set karein
+# app = Flask(__name__,
+#             template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
+#             static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+# CORS(app)
 
-# Database Configuration
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DATABASE_NAME = os.path.join(BASE_DIR, 'weather_data.db')
+# # Database Configuration
+# BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# DATABASE_NAME = os.path.join(BASE_DIR, 'weather_data.db')
 
-# Load environment variables from .env file (for local development)
-load_dotenv()
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+# # Load environment variables from .env file (for local development)
+# load_dotenv()
+# OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 
-if not OPENWEATHER_API_KEY:
-    # Ye warning Render logs mein dikhegi agar key set nahi hui
-    print("WARNING: OPENWEATHER_API_KEY environment variable not found. Weather API calls will likely fail.")
-    # Agar aap local mein strict error chahte hain toh ye line uncomment kar sakte hain
-    # raise ValueError("OPENWEATHER_API_KEY not found. Please set it in Render environment variables or .env file.")
+# if not OPENWEATHER_API_KEY:
+#     # Ye warning Render logs mein dikhegi agar key set nahi hui
+#     print("WARNING: OPENWEATHER_API_KEY environment variable not found. Weather API calls will likely fail.")
+#     # Agar aap local mein strict error chahte hain toh ye line uncomment kar sakte hain
+#     # raise ValueError("OPENWEATHER_API_KEY not found. Please set it in Render environment variables or .env file.")
 
-BASE_URL = "http://api.openweathermap.org/data/2.5/"
+# BASE_URL = "http://api.openweathermap.org/data/2.5/"
 
-# Load the trained ML model
-MODEL_PATH = os.path.join(BASE_DIR, 'linear_regression_model.joblib')
+# # Load the trained ML model
+# MODEL_PATH = os.path.join(BASE_DIR, 'linear_regression_model.joblib')
 
-PREDICTIVE_MODEL = None # Global variable to store the loaded model
+# PREDICTIVE_MODEL = None # Global variable to store the loaded model
 
-try:
-    PREDICTIVE_MODEL = joblib.load(MODEL_PATH)
-    print("Machine Learning Model loaded successfully!")
-except FileNotFoundError:
-    print(f"Error: Model file not found at {MODEL_PATH}. Please ensure it is saved and committed to Git.")
-except Exception as e:
-    print(f"Error loading the ML model: {e}")
+# try:
+#     PREDICTIVE_MODEL = joblib.load(MODEL_PATH)
+#     print("Machine Learning Model loaded successfully!")
+# except FileNotFoundError:
+#     print(f"Error: Model file not found at {MODEL_PATH}. Please ensure it is saved and committed to Git.")
+# except Exception as e:
+#     print(f"Error loading the ML model: {e}")
 
-# IMPORTANT: Ye list aapke Jupyter Notebook se 'X.columns.tolist()' ka exact output hai.
-MODEL_FEATURES = ['humidity', 'pressure', 'wind_speed', 'hour_of_day', 'day_of_week', 'month', 'city_Dubai', 'city_Moscow', 'city_Mumbai', 'city_New York', 'city_Paris', 'city_Sydney', 'city_Tokyo', 'city_Toronto', 'country_AU', 'country_CA', 'country_FR', 'country_IN', 'country_JP', 'country_RU', 'country_TH', 'country_US', 'description_clear sky', 'description_few clouds', 'description_light rain', 'description_mist', 'description_overcast clouds', 'icon_02n', 'icon_04d', 'icon_04n', 'icon_10n', 'icon_50n']
+# # IMPORTANT: Ye list aapke Jupyter Notebook se 'X.columns.tolist()' ka exact output hai.
+# MODEL_FEATURES = ['humidity', 'pressure', 'wind_speed', 'hour_of_day', 'day_of_week', 'month', 'city_Dubai', 'city_Moscow', 'city_Mumbai', 'city_New York', 'city_Paris', 'city_Sydney', 'city_Tokyo', 'city_Toronto', 'country_AU', 'country_CA', 'country_FR', 'country_IN', 'country_JP', 'country_RU', 'country_TH', 'country_US', 'description_clear sky', 'description_few clouds', 'description_light rain', 'description_mist', 'description_overcast clouds', 'icon_02n', 'icon_04d', 'icon_04n', 'icon_10n', 'icon_50n']
 
-@app.route('/')
-def home():
-    # Render index.html from the 'templates' folder
-    return render_template('index.html')
+# @app.route('/')
+# def home():
+#     # Render index.html from the 'templates' folder
+#     return render_template('index.html')
 
-@app.route('/weather')
-def get_weather():
-    city = request.args.get('city')
-    if not city:
-        return jsonify({"error": "City parameter is required"}), 400
+# @app.route('/weather')
+# def get_weather():
+#     city = request.args.get('city')
+#     if not city:
+#         return jsonify({"error": "City parameter is required"}), 400
 
-    params = {
-        "q": city,
-        "appid": OPENWEATHER_API_KEY, # Ab yahan environment variable use hoga
-        "units": "metric"
-    }
+#     params = {
+#         "q": city,
+#         "appid": OPENWEATHER_API_KEY, # Ab yahan environment variable use hoga
+#         "units": "metric"
+#     }
 
-    try:
-        current_weather_url = f"{BASE_URL}weather"
-        response = requests.get(current_weather_url, params=params)
-        response.raise_for_status() # HTTP errors ko catch karne ke liye
-        current_data = response.json()
+#     try:
+#         current_weather_url = f"{BASE_URL}weather"
+#         response = requests.get(current_weather_url, params=params)
+#         response.raise_for_status() # HTTP errors ko catch karne ke liye
+#         current_data = response.json()
 
-        forecast_url = f"{BASE_URL}forecast"
-        forecast_response = requests.get(forecast_url, params=params)
-        forecast_response.raise_for_status()
-        forecast_data = forecast_response.json()
+#         forecast_url = f"{BASE_URL}forecast"
+#         forecast_response = requests.get(forecast_url, params=params)
+#         forecast_response.raise_for_status()
+#         forecast_data = forecast_response.json()
 
-        weather_info = {
-            "city": current_data["name"],
-            "country": current_data["sys"]["country"],
-            "temperature": current_data["main"]["temp"],
-            "feels_like": current_data["main"]["feels_like"],
-            "humidity": current_data["main"]["humidity"],
-            "description": current_data["weather"][0]["description"],
-            "icon": current_data["weather"][0]["icon"],
-            "wind_speed": current_data["wind"]["speed"],
-            "pressure": current_data["main"]["pressure"]
-        }
+#         weather_info = {
+#             "city": current_data["name"],
+#             "country": current_data["sys"]["country"],
+#             "temperature": current_data["main"]["temp"],
+#             "feels_like": current_data["main"]["feels_like"],
+#             "humidity": current_data["main"]["humidity"],
+#             "description": current_data["weather"][0]["description"],
+#             "icon": current_data["weather"][0]["icon"],
+#             "wind_speed": current_data["wind"]["speed"],
+#             "pressure": current_data["main"]["pressure"]
+#         }
 
-        conn = None
-        try:
-            conn = sqlite3.connect(DATABASE_NAME)
-            cursor = conn.cursor()
+#         conn = None
+#         try:
+#             conn = sqlite3.connect(DATABASE_NAME)
+#             cursor = conn.cursor()
 
-            # Create table if it doesn't exist (ye bahut important hai)
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS current_weather (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    city TEXT NOT NULL,
-                    country TEXT,
-                    description TEXT,
-                    feels_like REAL,
-                    humidity INTEGER,
-                    icon TEXT,
-                    pressure INTEGER,
-                    temperature REAL,
-                    wind_speed REAL,
-                    collection_timestamp TEXT
-                )
-            ''')
-            conn.commit() # Table creation commit karein
+#             # Create table if it doesn't exist (ye bahut important hai)
+#             cursor.execute('''
+#                 CREATE TABLE IF NOT EXISTS current_weather (
+#                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                     city TEXT NOT NULL,
+#                     country TEXT,
+#                     description TEXT,
+#                     feels_like REAL,
+#                     humidity INTEGER,
+#                     icon TEXT,
+#                     pressure INTEGER,
+#                     temperature REAL,
+#                     wind_speed REAL,
+#                     collection_timestamp TEXT
+#                 )
+#             ''')
+#             conn.commit() # Table creation commit karein
 
-            current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#             current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            cursor.execute('''
-                INSERT INTO current_weather (
-                    city, country, description, feels_like, humidity,
-                    icon, pressure, temperature, wind_speed, collection_timestamp
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                weather_info['city'], weather_info['country'], weather_info['description'],
-                weather_info['feels_like'], weather_info['humidity'], weather_info['icon'],
-                weather_info['pressure'], weather_info['temperature'], weather_info['wind_speed'],
-                current_timestamp
-            ))
-            conn.commit()
-            print(f"Data for {city} saved to database at {current_timestamp}")
-        except sqlite3.Error as e:
-            print(f"ERROR: Could not save data for {city} to database. SQLite Error: {e}")
-            print(f"SQL Query attempt failed.")
-        finally:
-            if conn:
-                conn.close()
+#             cursor.execute('''
+#                 INSERT INTO current_weather (
+#                     city, country, description, feels_like, humidity,
+#                     icon, pressure, temperature, wind_speed, collection_timestamp
+#                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+#             ''', (
+#                 weather_info['city'], weather_info['country'], weather_info['description'],
+#                 weather_info['feels_like'], weather_info['humidity'], weather_info['icon'],
+#                 weather_info['pressure'], weather_info['temperature'], weather_info['wind_speed'],
+#                 current_timestamp
+#             ))
+#             conn.commit()
+#             print(f"Data for {city} saved to database at {current_timestamp}")
+#         except sqlite3.Error as e:
+#             print(f"ERROR: Could not save data for {city} to database. SQLite Error: {e}")
+#             print(f"SQL Query attempt failed.")
+#         finally:
+#             if conn:
+#                 conn.close()
 
-        daily_forecasts = {}
-        for item in forecast_data["list"]:
-            date = item["dt_txt"].split(" ")[0]
-            if date not in daily_forecasts:
-                daily_forecasts[date] = {
-                    "temp_max": item["main"]["temp_max"],
-                    "temp_min": item["main"]["temp_min"],
-                    "description": item["weather"][0]["description"],
-                    "icon": item["weather"][0]["icon"]
-                }
-            else:
-                daily_forecasts[date]["temp_max"] = max(daily_forecasts[date]["temp_max"], item["main"]["temp_max"])
-                daily_forecasts[date]["temp_min"] = min(daily_forecasts[date]["temp_min"], item["main"]["temp_min"])
+#         daily_forecasts = {}
+#         for item in forecast_data["list"]:
+#             date = item["dt_txt"].split(" ")[0]
+#             if date not in daily_forecasts:
+#                 daily_forecasts[date] = {
+#                     "temp_max": item["main"]["temp_max"],
+#                     "temp_min": item["main"]["temp_min"],
+#                     "description": item["weather"][0]["description"],
+#                     "icon": item["weather"][0]["icon"]
+#                 }
+#             else:
+#                 daily_forecasts[date]["temp_max"] = max(daily_forecasts[date]["temp_max"], item["main"]["temp_max"])
+#                 daily_forecasts[date]["temp_min"] = min(daily_forecasts[date]["temp_min"], item["main"]["temp_min"])
 
-        forecast_list = [{"date": date, **data} for date, data in daily_forecasts.items()]
+#         forecast_list = [{"date": date, **data} for date, data in daily_forecasts.items()]
 
-        return jsonify({
-            "current_weather": weather_info,
-            "forecast": forecast_list
-        })
+#         return jsonify({
+#             "current_weather": weather_info,
+#             "forecast": forecast_list
+#         })
 
-    except requests.exceptions.HTTPError as http_err:
-        error_msg = f"HTTP error occurred: {http_err}"
-        if response.status_code == 401:
-            error_msg += ". Check your OpenWeatherMap API Key."
-        return jsonify({"error": error_msg}), response.status_code
-    except requests.exceptions.ConnectionError as conn_err:
-        return jsonify({"error": f"Connection error occurred: {conn_err}"}), 503
-    except requests.exceptions.Timeout as timeout_err:
-        return jsonify({"error": f"Timeout error occurred: {timeout_err}"}), 504
-    except requests.exceptions.RequestException as req_err:
-        return jsonify({"error": f"An error occurred during API request: {req_err}"}), 500
-    except KeyError as e:
-        return jsonify({"error": f"Invalid data received from API or missing key: {e}. Check city name and API response structure."}), 500
-    except Exception as e:
-        return jsonify({"error": f"An unexpected server error occurred: {e}"}), 500
+#     except requests.exceptions.HTTPError as http_err:
+#         error_msg = f"HTTP error occurred: {http_err}"
+#         if response.status_code == 401:
+#             error_msg += ". Check your OpenWeatherMap API Key."
+#         return jsonify({"error": error_msg}), response.status_code
+#     except requests.exceptions.ConnectionError as conn_err:
+#         return jsonify({"error": f"Connection error occurred: {conn_err}"}), 503
+#     except requests.exceptions.Timeout as timeout_err:
+#         return jsonify({"error": f"Timeout error occurred: {timeout_err}"}), 504
+#     except requests.exceptions.RequestException as req_err:
+#         return jsonify({"error": f"An error occurred during API request: {req_err}"}), 500
+#     except KeyError as e:
+#         return jsonify({"error": f"Invalid data received from API or missing key: {e}. Check city name and API response structure."}), 500
+#     except Exception as e:
+#         return jsonify({"error": f"An unexpected server error occurred: {e}"}), 500
 
-# ----- Predict Temperature Route -----
-@app.route('/predict_temperature', methods=['GET'])
-def predict_temperature():
-    if PREDICTIVE_MODEL is None:
-        return jsonify({"error": "Prediction model not loaded. Please check backend logs."}), 500
+# # ----- Predict Temperature Route -----
+# @app.route('/predict_temperature', methods=['GET'])
+# def predict_temperature():
+#     if PREDICTIVE_MODEL is None:
+#         return jsonify({"error": "Prediction model not loaded. Please check backend logs."}), 500
 
-    city_name = request.args.get('city')
-    humidity = request.args.get('humidity', type=float)
-    pressure = request.args.get('pressure', type=float)
-    wind_speed = request.args.get('wind_speed', type=float)
+#     city_name = request.args.get('city')
+#     humidity = request.args.get('humidity', type=float)
+#     pressure = request.args.get('pressure', type=float)
+#     wind_speed = request.args.get('wind_speed', type=float)
 
-    current_time = datetime.now()
-    hour_of_day = current_time.hour
-    day_of_week = current_time.weekday()
-    month = current_time.month
+#     current_time = datetime.now()
+#     hour_of_day = current_time.hour
+#     day_of_week = current_time.weekday()
+#     month = current_time.month
 
-    if not all([city_name, humidity is not None, pressure is not None, wind_speed is not None]):
-        return jsonify({"error": "Missing one or more required parameters: city, humidity, pressure, wind_speed"}), 400
+#     if not all([city_name, humidity is not None, pressure is not None, wind_speed is not None]):
+#         return jsonify({"error": "Missing one or more required parameters: city, humidity, pressure, wind_speed"}), 400
 
-    input_data = {
-        'humidity': [humidity],
-        'pressure': [pressure],
-        'wind_speed': [wind_speed],
-        'hour_of_day': [hour_of_day],
-        'day_of_week': [day_of_week],
-        'month': [month]
-    }
+#     input_data = {
+#         'humidity': [humidity],
+#         'pressure': [pressure],
+#         'wind_speed': [wind_speed],
+#         'hour_of_day': [hour_of_day],
+#         'day_of_week': [day_of_week],
+#         'month': [month]
+#     }
 
-    input_df = pd.DataFrame(input_data)
+#     input_df = pd.DataFrame(input_data)
 
-    for feature in MODEL_FEATURES:
-        if feature not in input_df.columns:
-            input_df[feature] = 0
+#     for feature in MODEL_FEATURES:
+#         if feature not in input_df.columns:
+#             input_df[feature] = 0
 
-    city_col_name = f'city_{city_name}'
-    if city_col_name in input_df.columns:
-        input_df[city_col_name] = 1
-    else:
-        print(f"Warning: Unknown city '{city_name}' for prediction. Model might not perform well as its one-hot encoding is not activated.")
+#     city_col_name = f'city_{city_name}'
+#     if city_col_name in input_df.columns:
+#         input_df[city_col_name] = 1
+#     else:
+#         print(f"Warning: Unknown city '{city_name}' for prediction. Model might not perform well as its one-hot encoding is not activated.")
 
-    try:
-        prediction_input = input_df[MODEL_FEATURES]
-    except KeyError as k_err:
-        return jsonify({"error": f"Feature mismatch for prediction. Missing expected feature: {k_err}. Ensure MODEL_FEATURES list is correct and all expected columns are created."}), 500
-    except Exception as e:
-        return jsonify({"error": f"Error preparing prediction input: {e}"}), 500
+#     try:
+#         prediction_input = input_df[MODEL_FEATURES]
+#     except KeyError as k_err:
+#         return jsonify({"error": f"Feature mismatch for prediction. Missing expected feature: {k_err}. Ensure MODEL_FEATURES list is correct and all expected columns are created."}), 500
+#     except Exception as e:
+#         return jsonify({"error": f"Error preparing prediction input: {e}"}), 500
 
-    try:
-        predicted_temperature = PREDICTIVE_MODEL.predict(prediction_input)[0]
-        return jsonify({
-            "city": city_name,
-            "predicted_temperature": round(predicted_temperature, 2)
-        })
-    except Exception as e:
-        return jsonify({"error": f"Error during prediction: {e}"}), 500
+#     try:
+#         predicted_temperature = PREDICTIVE_MODEL.predict(prediction_input)[0]
+#         return jsonify({
+#             "city": city_name,
+#             "predicted_temperature": round(predicted_temperature, 2)
+#         })
+#     except Exception as e:
+#         return jsonify({"error": f"Error during prediction: {e}"}), 500
 
-if __name__ == '__main__':
-    # Local development ke liye .env file se API key load karne ke liye
-    # aapko ek .env file banani padegi 'backend' folder mein
-    # usmein likhna padega: OPENWEATHER_API_KEY="YOUR_ACTUAL_API_KEY"
-    # app.run(debug=True)
-    # Production ke liye, Render apne aap environment variables provide karta hai
-    app.run(host='0.0.0.0', port=os.environ.get('PORT', 10000)) # Render production settings
+# if __name__ == '__main__':
+#     # Local development ke liye .env file se API key load karne ke liye
+#     # aapko ek .env file banani padegi 'backend' folder mein
+#     # usmein likhna padega: OPENWEATHER_API_KEY="YOUR_ACTUAL_API_KEY"
+#     # app.run(debug=True)
+#     # Production ke liye, Render apne aap environment variables provide karta hai
+#     app.run(host='0.0.0.0', port=os.environ.get('PORT', 10000)) # Render production settings
 
 # import os
 # from flask import Flask, request, jsonify, render_template
@@ -458,3 +458,256 @@ if __name__ == '__main__':
 
 # if __name__ == '__main__':
 #     app.run(host='0.0.0.0', port=os.environ.get('PORT', 10000))
+
+
+
+import os
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
+from dotenv import load_dotenv
+import requests
+import joblib
+import pandas as pd
+import sqlite3
+from datetime import datetime
+
+# Flask app initialization
+app = Flask(__name__,
+            template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
+            static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+CORS(app)
+
+# Database Configuration
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DATABASE_NAME = os.path.join(BASE_DIR, 'weather_data.db')
+
+# Load environment variables from .env file (for local development)
+load_dotenv()
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+
+if not OPENWEATHER_API_KEY:
+    print("WARNING: OPENWEATHER_API_KEY environment variable not found. Weather API calls will likely fail.")
+
+BASE_URL = "http://api.openweathermap.org/data/2.5/"
+
+# Load the trained ML model
+MODEL_PATH = os.path.join(BASE_DIR, 'linear_regression_model.joblib')
+
+PREDICTIVE_MODEL = None # Global variable to store the loaded model
+
+try:
+    PREDICTIVE_MODEL = joblib.load(MODEL_PATH)
+    print("Machine Learning Model loaded successfully!")
+except FileNotFoundError:
+    print(f"Error: Model file not found at {MODEL_PATH}. Please ensure it is saved and committed to Git.")
+except Exception as e:
+    print(f"Error loading the ML model: {e}")
+
+# IMPORTANT: Ye list aapke Jupyter Notebook se 'X.columns.tolist()' ka exact output hai.
+# Is list mein aapne 'city_', 'country_', 'description_', aur 'icon_' features include kiye hain.
+MODEL_FEATURES = ['humidity', 'pressure', 'wind_speed', 'hour_of_day', 'day_of_week', 'month', 'city_Dubai', 'city_Moscow', 'city_Mumbai', 'city_New York', 'city_Paris', 'city_Sydney', 'city_Tokyo', 'city_Toronto', 'country_AU', 'country_CA', 'country_FR', 'country_IN', 'country_JP', 'country_RU', 'country_TH', 'country_US', 'description_clear sky', 'description_few clouds', 'description_light rain', 'description_mist', 'description_overcast clouds', 'icon_02n', 'icon_04d', 'icon_04n', 'icon_10n', 'icon_50n']
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/weather')
+def get_weather():
+    city = request.args.get('city')
+    if not city:
+        return jsonify({"error": "City parameter is required"}), 400
+
+    params = {
+        "q": city,
+        "appid": OPENWEATHER_API_KEY,
+        "units": "metric"
+    }
+
+    try:
+        current_weather_url = f"{BASE_URL}weather"
+        response = requests.get(current_weather_url, params=params)
+        response.raise_for_status()
+        current_data = response.json()
+
+        forecast_url = f"{BASE_URL}forecast"
+        forecast_response = requests.get(forecast_url, params=params)
+        forecast_response.raise_for_status()
+        forecast_data = forecast_response.json()
+
+        weather_info = {
+            "city": current_data["name"],
+            "country": current_data["sys"]["country"],
+            "temperature": current_data["main"]["temp"],
+            "feels_like": current_data["main"]["feels_like"],
+            "humidity": current_data["main"]["humidity"],
+            "description": current_data["weather"][0]["description"],
+            "icon": current_data["weather"][0]["icon"],
+            "wind_speed": current_data["wind"]["speed"],
+            "pressure": current_data["main"]["pressure"]
+        }
+
+        conn = None
+        try:
+            conn = sqlite3.connect(DATABASE_NAME)
+            cursor = conn.cursor()
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS current_weather (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    city TEXT NOT NULL,
+                    country TEXT,
+                    description TEXT,
+                    feels_like REAL,
+                    humidity INTEGER,
+                    icon TEXT,
+                    pressure INTEGER,
+                    temperature REAL,
+                    wind_speed REAL,
+                    collection_timestamp TEXT
+                )
+            ''')
+            conn.commit()
+
+            current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            cursor.execute('''
+                INSERT INTO current_weather (
+                    city, country, description, feels_like, humidity,
+                    icon, pressure, temperature, wind_speed, collection_timestamp
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                weather_info['city'], weather_info['country'], weather_info['description'],
+                weather_info['feels_like'], weather_info['humidity'], weather_info['icon'],
+                weather_info['pressure'], weather_info['temperature'], weather_info['wind_speed'],
+                current_timestamp
+            ))
+            conn.commit()
+            print(f"Data for {city} saved to database at {current_timestamp}")
+        except sqlite3.Error as e:
+            print(f"ERROR: Could not save data for {city} to database. SQLite Error: {e}")
+            print(f"SQL Query attempt failed.")
+        finally:
+            if conn:
+                conn.close()
+
+        daily_forecasts = {}
+        for item in forecast_data["list"]:
+            date = item["dt_txt"].split(" ")[0]
+            if date not in daily_forecasts:
+                daily_forecasts[date] = {
+                    "temp_max": item["main"]["temp_max"],
+                    "temp_min": item["main"]["temp_min"],
+                    "description": item["weather"][0]["description"],
+                    "icon": item["weather"][0]["icon"]
+                }
+            else:
+                daily_forecasts[date]["temp_max"] = max(daily_forecasts[date]["temp_max"], item["main"]["temp_max"])
+                daily_forecasts[date]["temp_min"] = min(daily_forecasts[date]["temp_min"], item["main"]["temp_min"])
+
+        forecast_list = [{"date": date, **data} for date, data in daily_forecasts.items()]
+
+        return jsonify({
+            "current_weather": weather_info,
+            "forecast": forecast_list
+        })
+
+    except requests.exceptions.HTTPError as http_err:
+        error_msg = f"HTTP error occurred: {http_err}"
+        if response.status_code == 401:
+            error_msg += ". Check your OpenWeatherMap API Key."
+        return jsonify({"error": error_msg}), response.status_code
+    except requests.exceptions.ConnectionError as conn_err:
+        return jsonify({"error": f"Connection error occurred: {conn_err}"}), 503
+    except requests.exceptions.Timeout as timeout_err:
+        return jsonify({"error": f"Timeout error occurred: {timeout_err}"}), 504
+    except requests.exceptions.RequestException as req_err:
+        return jsonify({"error": f"An error occurred during API request: {req_err}"}), 500
+    except KeyError as e:
+        return jsonify({"error": f"Invalid data received from API or missing key: {e}. Check city name and API response structure."}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected server error occurred: {e}"}), 500
+
+# ----- Predict Temperature Route -----
+@app.route('/predict_temperature', methods=['GET'])
+def predict_temperature():
+    if PREDICTIVE_MODEL is None:
+        return jsonify({"error": "Prediction model not loaded. Please check backend logs."}), 500
+
+    city_name = request.args.get('city')
+    humidity = request.args.get('humidity', type=float)
+    pressure = request.args.get('pressure', type=float)
+    wind_speed = request.args.get('wind_speed', type=float)
+    # Get description, icon, and country_code from frontend
+    description = request.args.get('description', type=str)
+    icon = request.args.get('icon', type=str)
+    country_code = request.args.get('country_code', type=str) # Assuming this is passed from frontend
+
+    current_time = datetime.now()
+    hour_of_day = current_time.hour
+    day_of_week = current_time.weekday()
+    month = current_time.month
+
+    # Validate all required parameters
+    if not all([city_name, humidity is not None, pressure is not None, wind_speed is not None, description, icon, country_code]):
+        return jsonify({"error": "Missing one or more required parameters for prediction: city, humidity, pressure, wind_speed, description, icon, country_code"}), 400
+
+    # Initialize a dictionary for all MODEL_FEATURES with initial value 0
+    prediction_features_dict = {feature: 0 for feature in MODEL_FEATURES}
+
+    # Populate numerical/time features
+    prediction_features_dict['humidity'] = humidity
+    prediction_features_dict['pressure'] = pressure
+    prediction_features_dict['wind_speed'] = wind_speed
+    prediction_features_dict['hour_of_day'] = hour_of_day
+    prediction_features_dict['day_of_week'] = day_of_week
+    prediction_features_dict['month'] = month
+
+    # Handle One-Hot Encoded Categorical Features
+    # City
+    city_feature_name = f'city_{city_name}'
+    if city_feature_name in prediction_features_dict:
+        prediction_features_dict[city_feature_name] = 1
+    else:
+        print(f"Warning: City '{city_name}' is not a recognized feature. '{city_feature_name}' not in MODEL_FEATURES. Its one-hot encoding will be 0.")
+
+    # Country
+    country_feature_name = f'country_{country_code}'
+    if country_feature_name in prediction_features_dict:
+        prediction_features_dict[country_feature_name] = 1
+    else:
+        print(f"Warning: Country code '{country_code}' is not a recognized feature. '{country_feature_name}' not in MODEL_FEATURES. Its one-hot encoding will be 0.")
+
+    # Description
+    description_feature_name = f'description_{description}'
+    if description_feature_name in prediction_features_dict:
+        prediction_features_dict[description_feature_name] = 1
+    else:
+        print(f"Warning: Description '{description}' is not a recognized feature. '{description_feature_name}' not in MODEL_FEATURES. Its one-hot encoding will be 0.")
+
+    # Icon
+    icon_feature_name = f'icon_{icon}'
+    if icon_feature_name in prediction_features_dict:
+        prediction_features_dict[icon_feature_name] = 1
+    else:
+        print(f"Warning: Icon '{icon}' is not a recognized feature. '{icon_feature_name}' not in MODEL_FEATURES. Its one-hot encoding will be 0.")
+
+    try:
+        # Convert the dictionary to a DataFrame with a single row
+        # Ensure the columns are in the exact order as MODEL_FEATURES
+        prediction_input_df = pd.DataFrame([prediction_features_dict])[MODEL_FEATURES]
+    except KeyError as k_err:
+        return jsonify({"error": f"Feature mismatch. Expected feature missing when creating prediction DataFrame: {k_err}. Ensure MODEL_FEATURES list is correct and all expected columns are handled."}), 500
+    except Exception as e:
+        return jsonify({"error": f"Error preparing prediction input DataFrame: {e}"}), 500
+
+    try:
+        predicted_temperature = PREDICTIVE_MODEL.predict(prediction_input_df)[0]
+        return jsonify({
+            "city": city_name,
+            "predicted_temperature": round(predicted_temperature, 2)
+        })
+    except Exception as e:
+        return jsonify({"error": f"Error during prediction: {e}. Model might not have all expected features or data type mismatch."}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=os.environ.get('PORT', 10000))
