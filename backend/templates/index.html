@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Dashboard</h1>
+        <div class="search-section">
+            <input type="text" id="city-input" placeholder="Enter city name">
+            <button id="get-weather-btn">Get Weather</button>
+        </div>
+
+        <div id="weather-display" class="weather-display">
+            <p>Enter a city to see weather information.</p>
+        </div>
+
+        <div class="forecast-section">
+            <h2>5-Day Forecast</h2>
+            <div id="forecast-display" class="forecast-display">
+                </div>
+        </div>
+
+        <div class="prediction-section">
+            <h2>Predict Temperature</h2>
+            <div class="prediction-form">
+                <input type="text" id="pred-city-input" placeholder="City for prediction">
+                <input type="number" id="pred-humidity-input" placeholder="Humidity (e.g., 70)" step="0.1">
+                <input type="number" id="pred-pressure-input" placeholder="Pressure (e.g., 1012)" step="0.1">
+                <input type="number" id="pred-wind-speed-input" placeholder="Wind Speed (e.g., 5.5)" step="0.1">
+                <button id="predict-btn">Predict Temperature</button>
+            </div>
+            <div id="prediction-result" class="prediction-result">
+                </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
