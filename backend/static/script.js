@@ -1,152 +1,204 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements for Weather Search
-    const cityInput = document.getElementById('city-input');
-    const getWeatherBtn = document.getElementById('get-weather-btn');
-    const weatherDisplay = document.getElementById('weather-display');
-    const forecastDisplay = document.getElementById('forecast-display');
+    // 1. Get DOM Elements (Updated IDs as per new HTML)
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const cityInput = document.getElementById('cityInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const loadingDiv = document.getElementById('loading'); // Changed ID
+    const errorDisplay = document.getElementById('errorDisplay'); // Changed ID
+    const weatherDisplay = document.getElementById('weatherDisplay'); // Changed ID
+    const predictionDisplay = document.getElementById('predictionDisplay'); // Changed ID
+    const predictedTempP = document.getElementById('predictedTemp'); // Changed ID
+    const forecastCardsContainer = document.getElementById('forecastCards'); // Changed ID
+    const forecastSection = document.querySelector('.forecast-section'); // Select the whole section
 
-    // DOM Elements for Prediction Form
-    const predCityInput = document.getElementById('pred-city-input');
-    const predHumidityInput = document.getElementById('pred-humidity-input');
-    const predPressureInput = document.getElementById('pred-pressure-input');
-    const predWindSpeedInput = document.getElementById('pred-wind-speed-input');
-    const predictBtn = document.getElementById('predict-btn');
-    const predictionResult = document.getElementById('prediction-result');
+    // Changed for Render deployment: Empty string means current domain
+    const BACKEND_URL = ''; 
 
-    // NEW: DOM Elements for Dark Mode Toggle
-    const themeToggle = document.getElementById('checkbox'); // This is the ID for the dark mode switch
-    const body = document.body; // Represents the <body> tag of your HTML
+    // Helper function to show/hide elements using flex for loading/error
+    const showElement = (element, displayType = 'flex') => { // Default to 'flex'
+        element.style.display = displayType;
+    };
+    const hideElement = (element) => {
+        element.style.display = 'none';
+    };
 
-    const BASE_API_URL = ''; // Empty string means current domain (useful for Render deployment)
+    // Helper function to display error messages
+    const showError = (message) => {
+        hideElement(loadingDiv);
+        hideElement(weatherDisplay);
+        hideElement(predictionDisplay);
+        hideElement(forecastSection); // Hide forecast on error
+        showElement(errorDisplay);
+        errorDisplay.querySelector('p').textContent = `Error: ${message}`;
+        searchBtn.disabled = false; // Re-enable button
+        searchBtn.innerHTML = '<i class="fas fa-search"></i> Get Weather & Predict'; // Restore button content
+    };
 
-    // --- Dark Mode Functionality ---
-    // Check for user's saved preference in localStorage when the page loads
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        body.classList.add('dark-mode'); // Apply dark mode class to body
-        themeToggle.checked = true; // Set the toggle switch to ON
+    // --- Dark Mode Toggle Logic ---
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme); // Use document.documentElement
+        if (currentTheme === 'dark') {
+            darkModeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+        } else {
+            darkModeToggle.querySelector('i').classList.replace('fa-sun', 'fa-moon');
+        }
+    } else {
+        // Default to light mode if no theme is set
+        document.documentElement.setAttribute('data-theme', 'light'); // Use document.documentElement
+        localStorage.setItem('theme', 'light');
+        // Ensure moon icon is shown for default light mode
+        darkModeToggle.querySelector('i').classList.remove('fa-sun'); // Remove sun if present
+        darkModeToggle.querySelector('i').classList.add('fa-moon'); // Add moon
     }
 
-    // Add event listener to the dark mode toggle switch
-    themeToggle.addEventListener('change', () => {
-        if (themeToggle.checked) {
-            // If switch is checked (ON), enable dark mode
-            body.classList.add('dark-mode');
-            localStorage.setItem('darkMode', 'enabled'); // Save preference
+    darkModeToggle.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme'); // Use document.documentElement
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            darkModeToggle.querySelector('i').classList.replace('fa-sun', 'fa-moon'); // Change to moon icon
         } else {
-            // If switch is unchecked (OFF), disable dark mode
-            body.classList.remove('dark-mode');
-            localStorage.setItem('darkMode', 'disabled'); // Save preference
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            darkModeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun'); // Change to sun icon
         }
     });
 
-    // --- Get Weather Button Event Listener ---
-    getWeatherBtn.addEventListener('click', async () => {
-        const city = cityInput.value.trim(); // Get city input and remove leading/trailing spaces
+    // --- Weather Fetching Logic ---
+    searchBtn.addEventListener('click', fetchWeatherData);
+
+    cityInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            fetchWeatherData();
+        }
+    });
+
+    async function fetchWeatherData() {
+        const city = cityInput.value.trim();
         if (!city) {
-            // If city input is empty, show an error message
-            weatherDisplay.innerHTML = '<p class="error-message">Please enter a city name.</p>';
-            forecastDisplay.innerHTML = ''; // Clear forecast
-            return; // Exit the function
-        }
-
-        // Show loading state while fetching data
-        weatherDisplay.innerHTML = '<p class="loading-message">Fetching weather data...</p>';
-        forecastDisplay.innerHTML = ''; // Clear previous forecast
-        getWeatherBtn.disabled = true; // Disable button to prevent multiple clicks
-        getWeatherBtn.textContent = 'Fetching...'; // Change button text to indicate loading
-
-        try {
-            // Fetch current weather data from your Flask backend
-            const response = await fetch(`${BASE_API_URL}/weather?city=${encodeURIComponent(city)}`);
-            const data = await response.json(); // Parse the JSON response
-
-            if (!response.ok) {
-                // If response is not OK (e.g., 404, 500), throw an error
-                throw new Error(data.error || 'Failed to fetch weather data.');
-            }
-
-            // --- Display Current Weather ---
-            const currentWeather = data.current_weather;
-            // Updated HTML structure for current weather to match the desired UI
-            weatherDisplay.innerHTML = `
-                <div class="weather-info">
-                    <h2>${currentWeather.city}, ${currentWeather.country}</h2>
-                    <div class="main-temp-section">
-                        <img src="http://openweathermap.org/img/wn/${currentWeather.icon}@2x.png" alt="${currentWeather.description}" class="weather-icon-large">
-                        <p class="temperature">${currentWeather.temperature}°C</p>
-                    </div>
-                    <p class="description">${currentWeather.description}</p>
-                    <div class="details-grid">
-                        <p><span>Feels like:</span> ${currentWeather.feels_like}°C</p>
-                        <p><span>Humidity:</span> ${currentWeather.humidity}%</p>
-                        <p><span>Wind Speed:</span> ${currentWeather.wind_speed} m/s</p>
-                        <p><span>Pressure:</span> ${currentWeather.pressure} hPa</p>
-                    </div>
-                </div>
-            `;
-
-            // --- Display Forecast ---
-            forecastDisplay.innerHTML = ''; // Clear previous forecast
-            data.forecast.forEach(day => {
-                const forecastCard = document.createElement('div');
-                forecastCard.classList.add('forecast-card'); // Add CSS class for styling
-                forecastCard.innerHTML = `
-                    <h3>${day.date}</h3>
-                    <img src="http://openweathermap.org/img/wn/${day.icon}.png" alt="${day.description}" class="forecast-icon">
-                    <p>Max Temp: ${day.temp_max}°C</p>
-                    <p>Min Temp: ${day.temp_min}°C</p>
-                    <p>Description: ${day.description}</p>
-                `;
-                forecastDisplay.appendChild(forecastCard); // Add card to forecast display area
-            });
-
-        } catch (error) {
-            console.error('Error fetching weather:', error);
-            weatherDisplay.innerHTML = `<p class="error-message">Error: ${error.message}</p>`;
-            forecastDisplay.innerHTML = '';
-        } finally {
-            getWeatherBtn.disabled = false; // Re-enable button
-            getWeatherBtn.textContent = 'Get Weather'; // Restore button text
-        }
-    });
-
-    // --- Predict Temperature Button Event Listener ---
-    predictBtn.addEventListener('click', async () => {
-        const city = predCityInput.value.trim();
-        const humidity = predHumidityInput.value;
-        const pressure = predPressureInput.value;
-        const windSpeed = predWindSpeedInput.value;
-
-        // Validate all prediction fields
-        if (!city || humidity === '' || pressure === '' || windSpeed === '') {
-            predictionResult.innerHTML = '<p class="error-message">Please fill all prediction fields.</p>';
+            showError('Please enter a city name.');
             return;
         }
 
-        predictionResult.innerHTML = '<p class="loading-message">Predicting temperature...</p>';
-        predictBtn.disabled = true;
-        predictBtn.textContent = 'Predicting...';
+        // Clear previous displays and show loading
+        weatherDisplay.innerHTML = '';
+        predictionDisplay.style.display = 'none';
+        errorDisplay.style.display = 'none';
+        forecastSection.style.display = 'none'; // Hide forecast section initially
+        showElement(loadingDiv); // Use helper function
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...'; // Spinner for button
+
+        let currentHumidity = null;
+        let currentPressure = null;
+        let currentWindSpeed = null;
 
         try {
-            // Fetch temperature prediction from your Flask backend
-            const response = await fetch(`${BASE_API_URL}/predict_temperature?city=${encodeURIComponent(city)}&humidity=${humidity}&pressure=${pressure}&wind_speed=${windSpeed}`);
-            const data = await response.json();
+            // --- Fetch Current Weather Data ---
+            const weatherResponse = await fetch(`${BACKEND_URL}/weather?city=${encodeURIComponent(city)}`);
+            const weatherData = await weatherResponse.json();
 
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to get prediction.');
+            if (weatherResponse.ok) {
+                // Display current weather and forecast
+                displayWeatherData(weatherData);
+
+                // Extract current weather parameters for prediction
+                if (weatherData.current_weather) {
+                    currentHumidity = weatherData.current_weather.humidity;
+                    currentPressure = weatherData.current_weather.pressure;
+                    currentWindSpeed = weatherData.current_weather.wind_speed;
+                }
+
+                // --- Fetch Predicted Temperature (only if current weather data is available) ---
+                if (currentHumidity !== null && currentPressure !== null && currentWindSpeed !== null) {
+                    await fetchPredictedTemperature(city, currentHumidity, currentPressure, currentWindSpeed);
+                } else {
+                    console.warn("Missing current weather data for prediction. Cannot fetch prediction.");
+                    predictedTempP.textContent = "Prediction N/A: Required weather data missing.";
+                    showElement(predictionDisplay, 'block'); // Show prediction section with error
+                }
+
+            } else {
+                showError(weatherData.error || 'Something went wrong while fetching weather data.');
             }
-
-            predictionResult.innerHTML = `
-                <h3>Predicted Temperature for ${data.city}:</h3>
-                <p class="predicted-temp-value">${data.predicted_temperature}°C</p>
-            `;
-
         } catch (error) {
-            console.error('Error predicting temperature:', error);
-            predictionResult.innerHTML = `<p class="error-message">Error: ${error.message}</p>`;
+            console.error('Error in fetching data:', error);
+            showError('Could not connect to the server or an unexpected error occurred.');
+            predictedTempP.textContent = "Prediction N/A: Network or server error."; // Show prediction error
+            showElement(predictionDisplay, 'block'); // Show prediction section with error
         } finally {
-            predictBtn.disabled = false;
-            predictBtn.textContent = 'Predict Temperature';
+            hideElement(loadingDiv); // Hide loading regardless of success/failure
+            searchBtn.disabled = false; // Re-enable button
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Get Weather & Predict'; // Restore button content
         }
-    });
+    }
+
+    async function fetchPredictedTemperature(city, humidity, pressure, wind_speed) {
+        try {
+            const predictResponse = await fetch(`${BACKEND_URL}/predict_temperature?city=${encodeURIComponent(city)}&humidity=${humidity}&pressure=${pressure}&wind_speed=${wind_speed}`);
+            const predictData = await predictResponse.json();
+
+            if (predictResponse.ok) {
+                predictedTempP.textContent = `${predictData.predicted_temperature.toFixed(2)}°C`; // Format to 2 decimal places
+                showElement(predictionDisplay, 'block'); // Show prediction section
+            } else {
+                console.error('Error fetching prediction:', predictData.error);
+                predictedTempP.textContent = `Prediction Error: ${predictData.error || 'Unknown error'}`;
+                showElement(predictionDisplay, 'block'); // Still show prediction section, but with error
+            }
+        } catch (error) {
+            console.error('Network error fetching prediction:', error);
+            predictedTempP.textContent = 'Prediction N/A (Network Error)';
+            showElement(predictionDisplay, 'block'); // Still show prediction section, but with error
+        }
+    }
+
+    function displayWeatherData(data) {
+        if (!data || !data.current_weather) {
+            showError('Invalid data received.');
+            return;
+        }
+
+        const { current_weather, forecast } = data;
+
+        // Display Current Weather
+        weatherDisplay.innerHTML = `
+            <div class="current-weather">
+                <h2>${current_weather.city}, ${current_weather.country}</h2>
+                <p class="current-temp">${current_weather.temperature.toFixed(1)}°C</p>
+                <p><img src="http://openweathermap.org/img/wn/${current_weather.icon}@2x.png" alt="${current_weather.description}"> <span class="description">${current_weather.description}</span></p>
+                <div class="weather-details-grid">
+                    <div class="weather-detail-item"><span>Feels like</span> ${current_weather.feels_like.toFixed(1)}°C</div>
+                    <div class="weather-detail-item"><span>Humidity</span> ${current_weather.humidity}%</div>
+                    <div class="weather-detail-item"><span>Wind Speed</span> ${current_weather.wind_speed.toFixed(2)} m/s</div>
+                    <div class="weather-detail-item"><span>Pressure</span> ${current_weather.pressure} hPa</div>
+                </div>
+            </div>
+        `;
+        showElement(weatherDisplay, 'block'); // Ensure weather display is shown
+
+        // Display Forecast
+        forecastCardsContainer.innerHTML = ''; // Clear previous forecast cards
+        if (forecast && forecast.length > 0) {
+            forecast.forEach(day => {
+                const forecastCard = document.createElement('div');
+                forecastCard.classList.add('forecast-card');
+                forecastCard.innerHTML = `
+                    <p class="date">${new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                    <img src="http://openweathermap.org/img/wn/${day.icon}.png" alt="${day.description}">
+                    <p class="temp-range">${day.temp_max.toFixed(1)}°C / ${day.temp_min.toFixed(1)}°C</p>
+                    <p class="desc">${day.description}</p>
+                `;
+                forecastCardsContainer.appendChild(forecastCard);
+            });
+            showElement(forecastSection, 'block'); // Show the entire forecast section
+        } else {
+            hideElement(forecastSection); // Hide if no forecast data
+        }
+    }
+
+    // Optionally, fetch weather for a default city on load
+    // cityInput.value = 'Bhopal'; // Example default city
+    // fetchWeatherData(); // Uncomment to fetch on page load
 });

@@ -1,355 +1,427 @@
-/* General Styling */
+/* CSS Variables for easy theme switching */
+:root {
+    /* Light Mode Variables */
+    --background-color: #f0f2f5;
+    --card-background: #ffffff;
+    --text-color: #333333;
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --input-background: #f8f9fa;
+    --input-border: #ced4da;
+    --error-color: #dc3545;
+    --loading-color: #6c757d;
+    --icon-color: #6c757d;
+}
+
+/* Dark Mode Variables applied when data-theme="dark" is set on <html> */
+[data-theme="dark"] {
+    --background-color: #212121;
+    --card-background: #333333;
+    --text-color: #e0e0e0;
+    --primary-color: #6a8dff; /* Lighter blue for dark mode primary */
+    --primary-hover: #4d6edb;
+    --border-color: #444444;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --input-background: #444444;
+    --input-border: #666666;
+    --error-color: #ff6b6b;
+    --loading-color: #bbbbbb;
+    --icon-color: #dddddd;
+}
+
+/* Base Body Styles */
 body {
-    font-family: 'Poppins', sans-serif;
-    /* Lighter blue and white gradient as per screenshot */
-    background: linear-gradient(135deg, #e0f2f7 0%, #b3e5fc 100%); /* Light blue tones */
-    color: #333; /* Darker text for better readability on light background */
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
     margin: 0;
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align to top initially */
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme changes */
     box-sizing: border-box;
-    overflow-x: hidden;
-    transition: background 0.3s ease, color 0.3s ease; /* For dark mode transition */
 }
 
-/* Dark Mode styles */
-body.dark-mode {
-    background: linear-gradient(135deg, #2b2b2b 0%, #000000 100%); /* Darker gradient */
-    color: #f0f0f0; /* Lighter text for dark mode */
-}
-
+/* Main Container Styling */
 .container {
-    background-color: rgba(255, 255, 255, 0.85); /* Slightly less transparent white */
-    backdrop-filter: blur(10px);
-    border-radius: 15px; /* More rounded container as per screenshot */
-    padding: 40px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.17); /* Softer shadow */
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    padding: 30px 40px;
     width: 100%;
-    max-width: 900px;
+    max-width: 700px; /* Max width for a balanced look */
     text-align: center;
-    animation: fadeIn 1s ease-out;
-    transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; /* For dark mode transition */
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-/* Dark Mode Container */
-body.dark-mode .container {
-    background-color: rgba(0, 0, 0, 0.7); /* Darker semi-transparent background */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-}
-
-/* Keyframe for fade-in animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-h1, h2 {
-    color: #333; /* Dark headings for light mode */
+/* Header Section */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 25px;
-    font-weight: 600;
 }
 
-/* Dark Mode Headings */
-body.dark-mode h1, body.dark-mode h2 {
-    color: #f0f0f0; /* Lighter headings for dark mode */
+/* Headings Styling */
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--primary-color);
+    font-size: 2.2em;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle text shadow */
+    transition: color 0.3s ease;
 }
 
-/* Input and Button Styling */
-.search-section, .prediction-form {
+h2 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--primary-color);
+    font-size: 1.8em;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+
+h3 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    transition: color 0.3s ease;
+}
+
+/* Search Box Styling */
+.search-box {
+    display: flex;
+    gap: 15px; /* Space between input and button */
+    margin-bottom: 30px;
+}
+
+.search-box input[type="text"] {
+    flex-grow: 1; /* Input takes available space */
+    padding: 12px 18px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 1.1em;
+    outline: none; /* Remove default outline */
+    background-color: var(--input-background);
+    color: var(--text-color);
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.search-box input[type="text"]::placeholder {
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.search-box input[type="text"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus glow effect */
+}
+
+.search-box button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex; /* For icon and text alignment */
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+.search-box button i {
+    color: white; /* Icon color */
+}
+
+.search-box button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Dark Mode Toggle Button Styling */
+.dark-mode-toggle {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 45px;
+    height: 45px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
+    align-items: center;
+    box-shadow: 0 2px 5px var(--shadow-color);
 }
 
-input[type="text"], input[type="number"] {
-    padding: 12px 20px; /* Adjusted padding */
-    border: none; /* Remove border */
-    border-radius: 25px; /* More rounded input as per screenshot */
-    background-color: rgba(255, 255, 255, 0.7); /* Lighter background for light mode */
-    color: #333; /* Darker text */
-    flex: 1;
-    min-width: 180px;
-    font-size: 1em;
-    outline: none;
-    transition: all 0.3s ease;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle inner shadow */
+.dark-mode-toggle:hover {
+    background-color: var(--primary-hover);
+    transform: rotate(15deg); /* Spin effect on hover */
 }
 
-input[type="text"]::placeholder, input[type="number"]::placeholder {
-    color: #999;
+.dark-mode-toggle i {
+    transition: color 0.3s ease;
 }
 
-input[type="text"]:focus, input[type="number"]:focus {
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(0, 123, 255, 0.2); /* Blue glow on focus */
-}
-
-/* Dark Mode Inputs */
-body.dark-mode input[type="text"], body.dark-mode input[type="number"] {
-    background-color: rgba(255, 255, 255, 0.1); /* Darker input background */
-    color: #f0f0f0;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode input[type="text"]::placeholder, body.dark-mode input[type="number"]::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-body.dark-mode input[type="text"]:focus, body.dark-mode input[type="number"]:focus {
-    background-color: rgba(255, 255, 255, 0.15);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(0, 123, 255, 0.4);
-}
-
-
-button {
-    background-color: #007bff; /* Primary blue as per screenshot */
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 25px; /* More rounded button as per screenshot */
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* Dark Mode Button */
-body.dark-mode button {
-    background-color: #4CAF50; /* Example: Green for dark mode button */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-}
-
-body.dark-mode button:hover {
-    background-color: #388E3C; /* Darker green on hover */
-}
-
-
-/* Display Sections */
-.weather-display, .prediction-result {
-    margin-top: 25px;
+/* Weather Display Section */
+.weather-display {
+    background-color: var(--card-background);
     padding: 25px;
-    /* border: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border for light mode */
-    border-radius: 15px; /* Rounded corners */
-    background-color: rgba(255, 255, 255, 0.8); /* Lighter background for light mode */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--shadow-color);
     text-align: left;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
-    transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-/* Dark Mode Display Sections */
-body.dark-mode .weather-display, body.dark-mode .prediction-result {
-    background-color: rgba(0, 0, 0, 0.5); /* Darker background */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+.weather-display .current-weather {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
-
-.weather-display p, .prediction-result p {
-    font-size: 1.1em;
-    line-height: 1.6;
-    color: #333; /* Darker text for light mode */
+.weather-display .current-weather h2 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    text-align: center;
 }
 
-/* Dark Mode Paragraphs */
-body.dark-mode .weather-display p, body.dark-mode .prediction-result p {
-    color: #f0f0f0; /* Lighter text for dark mode */
+.weather-display .current-temp {
+    font-size: 3.5em;
+    font-weight: 700;
+    margin: 10px 0;
+    color: var(--text-color);
+    text-align: center;
 }
 
+.weather-display .current-weather p {
+    font-size: 1.2em;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
 
-.weather-display img, .forecast-card img {
+.weather-display .current-weather p img {
     vertical-align: middle;
-    margin-left: 8px;
-    width: 50px; /* Larger icons for current weather */
-    height: 50px;
 }
+
+.weather-display .current-weather .description {
+    text-transform: capitalize;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Weather Details Grid */
+.weather-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid columns */
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.weather-detail-item {
+    background-color: var(--input-background); /* Use input background for details */
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    text-align: center;
+    font-size: 1em;
+    color: var(--text-color);
+}
+
+.weather-detail-item span {
+    display: block; /* Make label appear above value */
+    font-size: 0.9em;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
 
 /* Forecast Section */
 .forecast-section {
     margin-top: 40px;
+    border-top: 1px dashed var(--border-color); /* Dashed separator */
+    padding-top: 30px;
 }
 
-.forecast-display {
-    display: flex;
-    flex-wrap: wrap;
+.forecast-section h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+}
+
+.forecast-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 20px;
     justify-content: center;
-    margin-top: 25px;
 }
 
 .forecast-card {
-    background-color: rgba(255, 255, 255, 0.7); /* Lighter background for light mode */
-    padding: 20px;
-    border-radius: 15px; /* Rounded corners */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
-    flex: 1 1 calc(33% - 40px);
-    min-width: 250px;
-    box-sizing: border-box;
-    text-align: left;
-    transition: transform 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.forecast-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow on hover */
-}
-
-/* Dark Mode Forecast Card */
-body.dark-mode .forecast-card {
-    background-color: rgba(0, 0, 0, 0.3); /* Darker background */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-}
-
-body.dark-mode .forecast-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-}
-
-.forecast-card h3 {
-    color: #333; /* Dark headings for light mode */
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.2em;
-    font-weight: 600;
-}
-
-/* Dark Mode Forecast Card Headings */
-body.dark-mode .forecast-card h3 {
-    color: #f0f0f0; /* Lighter headings for dark mode */
-}
-
-.forecast-card p {
-    font-size: 0.95em;
-    color: #555; /* Slightly darker text for light mode */
-}
-
-/* Dark Mode Forecast Card Paragraphs */
-body.dark-mode .forecast-card p {
-    color: #ccc; /* Lighter text for dark mode */
-}
-
-.prediction-section {
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border */
-}
-
-/* Dark Mode Prediction Section Border */
-body.dark-mode .prediction-section {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.prediction-result {
+    background-color: var(--input-background);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
     text-align: center;
-    font-weight: 600;
-    font-size: 1.2em;
-    color: #333; /* Darker text for light mode */
+    border: 1px solid var(--input-border);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-/* Dark Mode Prediction Result */
-body.dark-mode .prediction-result {
-    color: #f0f0f0; /* Lighter text for dark mode */
+.forecast-card .date {
+    font-weight: 700;
+    font-size: 0.95em;
+    margin-bottom: 8px;
+    color: var(--primary-color);
 }
 
+.forecast-card img {
+    width: 60px;
+    height: 60px;
+    margin: 5px 0;
+}
 
-/* NEW: Dark Mode Toggle Switch */
-.theme-switch-wrapper {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+.forecast-card .temp-range {
+    font-weight: 700;
+    font-size: 1.1em;
+    margin: 5px 0;
+    color: var(--text-color);
+}
+
+.forecast-card .desc {
+    font-size: 0.9em;
+    text-transform: capitalize;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+/* Prediction Display Section */
+.prediction-display {
+    background-color: var(--card-background);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    text-align: center;
+    border: 1px solid var(--border-color);
+    margin-top: 30px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.prediction-display h2 {
+    color: var(--primary-color);
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.prediction-display p {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* Loading Spinner */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: var(--loading-color);
+}
+
+.spinner {
+    border: 4px solid var(--loading-color);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error Display */
+.error-display {
+    background-color: var(--error-color);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
-    z-index: 1000; /* Ensure it's above other elements */
+    justify-content: center;
+    gap: 10px;
 }
 
-.theme-switch {
-    display: inline-block;
-    height: 34px;
-    position: relative;
-    width: 60px;
+.error-display p {
+    margin: 0;
+    font-weight: 700;
 }
 
-.theme-switch input {
-    display: none;
-}
-
-.slider {
-    background-color: #ccc;
-    bottom: 0;
-    cursor: pointer;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    background-color: #fff;
-    bottom: 4px;
-    content: "";
-    height: 26px;
-    left: 4px;
-    position: absolute;
-    transition: .4s;
-    width: 26px;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #2196F3; /* Blue for ON state */
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* Round slider */
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-
-/* Responsive Adjustments */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .container {
-        padding: 25px;
+    body {
+        align-items: flex-start; /* Reset align-items for smaller screens */
     }
-    .search-section, .prediction-form {
+    .container {
+        padding: 25px 25px;
+        margin-top: 20px; /* Add some top margin for small screens */
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+    .search-box {
         flex-direction: column;
-        align-items: stretch;
         gap: 10px;
     }
-    input[type="text"], input[type="number"], button {
+    .search-box button {
         width: 100%;
-        min-width: unset;
+        justify-content: center;
     }
-    .forecast-card {
-        flex: 1 1 calc(50% - 20px);
+    .forecast-cards {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     }
-    .theme-switch-wrapper {
-        top: 10px;
-        right: 10px;
+    .weather-display .current-temp {
+        font-size: 3em;
+    }
+    .prediction-display p {
+        font-size: 2em;
     }
 }
 
-@media (max-width: 550px) {
+@media (max-width: 480px) {
+    .container {
+        padding: 20px 15px;
+    }
+    h1 {
+        font-size: 1.5em;
+    }
+    .weather-display .current-weather p {
+        font-size: 1em;
+    }
     .forecast-card {
-        flex: 1 1 100%;
+        padding: 10px;
     }
 }
