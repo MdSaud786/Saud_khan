@@ -953,9 +953,10 @@ def predict_temperature():
 
     try:
         predicted_temperature = PREDICTIVE_MODEL.predict(prediction_input_df)[0]
+        predicted_temperature_celsius = (predicted_temperature - 32) * 5/9  ## yah UPDATE KIYE HAI
         return jsonify({
             "city": city_name,
-            "predicted_temperature": round(predicted_temperature, 2)
+            "predicted_temperature": round(predicted_temperature_celsius, 2)
         })
     except Exception as e:
         return jsonify({"error": f"Error during prediction: {e}. Model might not have all expected features or data type mismatch."}), 500
